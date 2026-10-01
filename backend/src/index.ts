@@ -18,43 +18,52 @@ const PORT = process.env.PORT || 5000;
 // ============================================
 // CORS Configuration
 // ============================================
-// Allowed origins for both local development and production.
-// Any *.vercel.app subdomain is also allowed automatically.
+// Explicitly allow local dev + Vercel + Render origins.
+// Using a simple boolean check avoids edge cases with the callback API.
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    // Add your production frontend URL here after deploying to Vercel:
-    // "https://your-app.vercel.app"
+    "https://full-stack-task-manager-alpha.vercel.app"
 ];
 
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            // Allow requests with no origin (Postman, curl, mobile apps)
-            if (!origin) return callback(null, true);
+const corsOptions: cors.CorsOptions = {
+    origin: (origin, callback) => {
+        // Allow requests with no origin (Postman, curl, mobile apps)
+        if (!origin) {
+            return callback(null, true);
+        }
 
-            // Allow configured origins
-            if (allowedOrigins.indexOf(origin) !== -1) {
-                return callback(null, true);
-            }
+        // Check explicit whitelist
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
 
-            // Allow any Vercel preview/production URL
-            if (origin.endsWith(".vercel.app")) {
-                return callback(null, true);
-            }
+        // Allow any Vercel preview/production URL
+        if (origin.endsWith(".vercel.app")) {
+            return callback(null, true);
+        }
 
-            // Allow Render preview URLs (optional)
-            if (origin.endsWith(".onrender.com")) {
-                return callback(null, true);
-            }
+        // Allow Render subdomains (for internal health checks)
+        if (origin.endsWith(".onrender.com")) {
+            return callback(null, true);
+        }
 
-            return callback(new Error(`CORS blocked for origin: ${origin}`));
-        },
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"]
-    })
-);
+        // Log and reject unknown origins — but return `false`, not an Error,
+        // so the CORS middleware doesn't throw.
+        console.warn(`⚠️  CORS blocked origin: ${origin}`);
+        return callback(null, false);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204
+};
+
+// Apply CORS to ALL routes (including preflight OPTIONS)
+app.use(cors(corsOptions));
+
+// Explicitly handle preflight for Express 5 compatibility
+app.options(/.*/, cors(corsOptions));
 
 // ============================================
 // Body Parsing Middleware
@@ -115,7 +124,7 @@ const start = async (): Promise<void> => {
         app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
-            console.log(`   Local URL: http://localhost:${PORT}`);
+            console.log(`   Allowed origins:`, allowedOrigins);
         });
     } catch (error) {
         console.error("❌ Failed to start server:", error);
