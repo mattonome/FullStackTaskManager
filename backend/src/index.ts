@@ -15,28 +15,25 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
-// CORS Configuration (Manual Headers)
+// Manual CORS Middleware
 // ============================================
-// Express 5 changed wildcard route parsing (path-to-regexp v8),
-// which breaks the `cors` middleware's preflight handling.
-// Setting headers manually with `res.setHeader` avoids this entirely.
-const allowedOrigins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://full-stack-task-manager-alpha.vercel.app"
-];
-
+// This bypasses the `cors` package entirely to avoid Express 5
+// wildcard route parsing issues. It sets the headers manually
+// and handles the OPTIONS preflight request directly.
 app.use((req, res, next) => {
     const origin = req.headers.origin;
 
-    if (origin && (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app"))) {
+    // Allow local development and any Vercel deployment
+    if (origin && (origin.includes("localhost") || origin.endsWith(".vercel.app"))) {
         res.setHeader("Access-Control-Allow-Origin", origin);
-        res.setHeader("Access-Control-Allow-Credentials", "true");
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     }
 
-    // Handle preflight requests immediately
+    // These headers are safe to set for all requests
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+
+    // Handle the preflight request immediately
     if (req.method === "OPTIONS") {
         return res.sendStatus(204);
     }
@@ -67,34 +64,6 @@ app.get("/", (req, res) => {
 });
 
 // ============================================
-// 404 Handler
-// ============================================
-app.use((req, res) => {
-    res.status(404).json({
-        message: "Route not found",
-        path: req.originalUrl
-    });
-});
-
-// ============================================
-// Global Error Handler
-// ============================================
-app.use(
-    (
-        err: Error,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ) => {
-        console.error("❌ Error:", err.message);
-        res.status(500).json({
-            message: "Internal server error",
-            error: process.env.NODE_ENV === "production" ? undefined : err.message
-        });
-    }
-);
-
-// ============================================
 // Start Server
 // ============================================
 const start = async (): Promise<void> => {
@@ -103,7 +72,6 @@ const start = async (): Promise<void> => {
         app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
-            console.log(`   Allowed origins:`, allowedOrigins);
         });
     } catch (error) {
         console.error("❌ Failed to start server:", error);
