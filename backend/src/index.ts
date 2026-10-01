@@ -15,11 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
-// Manual CORS Middleware
+// CORS Middleware (Manual - No `cors` package)
 // ============================================
-// This bypasses the `cors` package entirely to avoid Express 5
-// wildcard route parsing issues. It sets the headers manually
-// and handles the OPTIONS preflight request directly.
+// This must be the FIRST middleware, immediately after `const app = express()`.
+// Bypasses Express 5 wildcard route parsing issues.
 app.use((req, res, next) => {
     const origin = req.headers.origin;
 
@@ -33,9 +32,9 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.setHeader("Access-Control-Allow-Credentials", "true");
 
-    // Handle the preflight request immediately
+    // Handle the preflight request immediately and stop further processing
     if (req.method === "OPTIONS") {
-        return res.sendStatus(204);
+        return res.status(204).end();
     }
 
     next();
@@ -57,7 +56,7 @@ app.use("/api/tasks", taskRoutes);
 // ============================================
 app.get("/", (req, res) => {
     res.json({
-        message: "Task Manager API is running",
+        message: "Task Manager API - V2 MANUAL CORS",
         environment: process.env.NODE_ENV || "development",
         timestamp: new Date().toISOString()
     });
