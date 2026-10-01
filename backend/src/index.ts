@@ -17,8 +17,8 @@ const PORT = process.env.PORT || 5000;
 // ============================================
 // CORS Middleware (Manual - No `cors` package)
 // ============================================
-// This must be the FIRST middleware, immediately after `const app = express()`.
 // Bypasses Express 5 wildcard route parsing issues.
+// Allows local dev, Vercel, and Render origins.
 app.use((req, res, next) => {
     const origin = req.headers.origin;
 
@@ -56,7 +56,7 @@ app.use("/api/tasks", taskRoutes);
 // ============================================
 app.get("/", (req, res) => {
     res.json({
-        message: "Task Manager API - V2 MANUAL CORS",
+        message: "Task Manager API is running",
         environment: process.env.NODE_ENV || "development",
         timestamp: new Date().toISOString()
     });
