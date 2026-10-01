@@ -6,7 +6,7 @@
 import axios from "axios";
 import type { Task, Priority, Status } from "../types/Task";
 
-const API_URL = "http://localhost:5000/api/tasks";
+const API_URL = "https://taskmanager.onrender.com/api/tasks";
 
 export const taskService = {
     // Get all tasks
