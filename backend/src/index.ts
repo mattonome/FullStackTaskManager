@@ -19,7 +19,6 @@ const PORT = process.env.PORT || 5000;
 // CORS Configuration
 // ============================================
 // Explicitly allow local dev + Vercel + Render origins.
-// Using a simple boolean check avoids edge cases with the callback API.
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
@@ -48,8 +47,7 @@ const corsOptions: cors.CorsOptions = {
             return callback(null, true);
         }
 
-        // Log and reject unknown origins — but return `false`, not an Error,
-        // so the CORS middleware doesn't throw.
+        // Log and reject unknown origins gracefully
         console.warn(`⚠️  CORS blocked origin: ${origin}`);
         return callback(null, false);
     },
