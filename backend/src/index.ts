@@ -18,7 +18,6 @@ const PORT = process.env.PORT || 5000;
 // ============================================
 // CORS Configuration
 // ============================================
-// Explicitly allow local dev + Vercel + Render origins.
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
@@ -34,20 +33,22 @@ const corsOptions: cors.CorsOptions = {
 
         // Check explicit whitelist
         if (allowedOrigins.includes(origin)) {
+            console.log(`✅ CORS allowed: ${origin}`);
             return callback(null, true);
         }
 
         // Allow any Vercel preview/production URL
         if (origin.endsWith(".vercel.app")) {
+            console.log(`✅ CORS allowed (Vercel): ${origin}`);
             return callback(null, true);
         }
 
         // Allow Render subdomains (for internal health checks)
         if (origin.endsWith(".onrender.com")) {
+            console.log(`✅ CORS allowed (Render): ${origin}`);
             return callback(null, true);
         }
 
-        // Log and reject unknown origins gracefully
         console.warn(`⚠️  CORS blocked origin: ${origin}`);
         return callback(null, false);
     },
@@ -57,11 +58,31 @@ const corsOptions: cors.CorsOptions = {
     optionsSuccessStatus: 204
 };
 
-// Apply CORS to ALL routes (including preflight OPTIONS)
+// ============================================
+// CORS Middleware (handles preflight automatically)
+// ============================================
+// The `cors` middleware handles OPTIONS preflight requests automatically
+// when applied globally. This is the ONLY CORS setup needed.
 app.use(cors(corsOptions));
 
-// Explicitly handle preflight for Express 5 compatibility
-app.options(/.*/, cors(corsOptions));
+// ============================================
+// Custom Middleware to Explicitly Set CORS Headers
+// ============================================
+// This bypasses any platform-level header stripping by Render.
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app"))) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    }
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+    next();
+});
 
 // ============================================
 // Body Parsing Middleware
