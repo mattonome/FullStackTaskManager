@@ -1,7 +1,7 @@
 {
   "name": "taskmanager-backend",
   "version": "1.0.0",
-  "description": "Backend API for the Full-Stack Task Manager",
+  "description": "Full-stack Task Manager backend serving API + React frontend",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsx src/index.ts",
@@ -9,18 +9,21 @@
     "build": "tsc",
     "serve": "node dist/index.js"
   },
-  "keywords": ["typescript", "express", "mongodb", "task-manager"],
+  "keywords": [
+    "typescript",
+    "express",
+    "mongodb",
+    "task-manager"
+  ],
   "author": "Matthew",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "mongoose": "^8.8.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.10.2",

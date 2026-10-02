@@ -1,15 +1,15 @@
 /**
  * File: taskService.ts
  * Purpose: API service for communicating with the backend.
- *          Uses a relative path so Vercel can proxy requests to Render,
- *          avoiding CORS issues entirely.
+ *          Uses a relative path because the backend serves the frontend
+ *          from the same origin — no CORS needed.
  */
 
 import axios from "axios";
 import type { Task, Priority, Status } from "../types/Task";
 
-// Relative path — Vercel will proxy /api/* to the Render backend.
-// This means the browser makes a same-origin request, so no CORS check happens.
+// Relative path — since Express serves both API and frontend,
+// this resolves to the same origin. No CORS.
 const API_URL = "/api/tasks";
 
 export const taskService = {

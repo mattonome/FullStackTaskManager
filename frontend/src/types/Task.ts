@@ -1,6 +1,6 @@
 /**
  * File: Task.ts
- * Purpose: TypeScript types for Task, mirroring the backend model.
+ * Purpose: TypeScript types for Task.
  */
 
 export type Status = "pending" | "completed";

@@ -1,10 +1,11 @@
 /**
  * File: index.ts
- * Purpose: Main entry point for the Express backend.
- *          Configured for both local development and production deployment.
+ * Purpose: Express backend that serves both the API and the React frontend.
+ *          Single-deployment architecture — no CORS needed.
  */
 
 import express from "express";
+import path from "path";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 import taskRoutes from "./routes/taskRoutes";
@@ -15,51 +16,34 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
-// CORS Middleware (Manual - No `cors` package)
-// ============================================
-// Bypasses Express 5 wildcard route parsing issues.
-// Allows local dev, Vercel, and Render origins.
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-
-    // Allow local development and any Vercel deployment
-    if (origin && (origin.includes("localhost") || origin.endsWith(".vercel.app"))) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-
-    // These headers are safe to set for all requests
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-
-    // Handle the preflight request immediately and stop further processing
-    if (req.method === "OPTIONS") {
-        return res.status(204).end();
-    }
-
-    next();
-});
-
-// ============================================
 // Body Parsing Middleware
 // ============================================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================
-// Routes
+// API Routes
 // ============================================
 app.use("/api/tasks", taskRoutes);
 
-// ============================================
-// Health Check Endpoint
-// ============================================
-app.get("/", (req, res) => {
+// API health check
+app.get("/api", (req, res) => {
     res.json({
         message: "Task Manager API is running",
         environment: process.env.NODE_ENV || "development",
         timestamp: new Date().toISOString()
     });
+});
+
+// ============================================
+// Serve React Frontend Static Files
+// ============================================
+const publicPath = path.join(__dirname, "../public");
+app.use(express.static(publicPath));
+
+// SPA fallback — send index.html for any non-API route
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(publicPath, "index.html"));
 });
 
 // ============================================
@@ -71,6 +55,7 @@ const start = async (): Promise<void> => {
         app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
+            console.log(`   Serving frontend from: ${publicPath}`);
         });
     } catch (error) {
         console.error("❌ Failed to start server:", error);

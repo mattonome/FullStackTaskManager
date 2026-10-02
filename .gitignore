@@ -7,11 +7,15 @@ dist/
 */dist/
 build/
 */build/
+public/
+backend/public/
 
-# Environment variables (SECURITY!)
+# Environment variables
 .env
 *.env
 !*.env.example
+.env.local
+*.local
 
 # Logs
 *.log
@@ -27,3 +31,6 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Vercel
+.vercel/
