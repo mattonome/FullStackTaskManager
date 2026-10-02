@@ -4,7 +4,7 @@
 
 As a software engineer, I am expanding my skillset by building a complete full-stack web application that connects a modern React frontend to a cloud-hosted MongoDB database through a TypeScript-powered Express API. This project represents my journey into production-grade full-stack development — from local development to live cloud deployment.
 
-The **Full-Stack Task Manager** is a web application that allows users to create, view, complete, and delete tasks through a clean, responsive interface. All data is persisted to a MongoDB Atlas cloud database, and the application is fully deployed with the frontend on Vercel and the backend API on Render.
+The **Full-Stack Task Manager** is a web application that allows users to create, view, complete, and delete tasks through a clean, responsive interface. All data is persisted to a MongoDB Atlas cloud database, and the application is fully deployed as a **single service on Render**, where Express serves both the REST API and the compiled React frontend.
 
 **Purpose:** This software was created to deepen my understanding of full-stack web development by building a production-ready application. Through this project, I gained hands-on experience with:
 
@@ -12,22 +12,22 @@ The **Full-Stack Task Manager** is a web application that allows users to create
 - Modeling data with Mongoose and connecting to MongoDB Atlas
 - Building a modern React frontend with Vite and TypeScript
 - Managing state and handling async operations in React
-- Making HTTP requests with Axios and handling CORS
-- Deploying a full-stack application to cloud platforms (Render + Vercel)
+- Making HTTP requests with Axios
+- Deploying a full-stack application to the cloud (single-service architecture)
+- Serving a compiled React build from an Express backend
 - Managing environment variables and secrets across environments
 
-[Software Demo Video](http://youtube.link.goes.here)
+
+[Software Demo Video](https://drive.google.com/file/d/1U2ACVnGYeGJOoMZTn4a5FWkmjuotU2Co/view?usp=sharing)
 
 ### Live Demo
 
 | Service | URL |
 | :--- | :--- |
 | **GitHub Repository** | `https://github.com/mattonome/FullStackTaskManager` |
-| **Frontend (Vercel)** | `https://full-stack-task-manager-alpha.vercel.app/` |
-| **Backend API (Render)** | `https://taskmanager.onrender.com` |
-| **API Health Check** | `https://taskmanager.onrender.com/api/tasks` |
+| **Application (Render)** | `https://taskmanager.onrender.com` |
 
-> **Note:** The backend runs on Render's free tier and sleeps after 15 minutes of inactivity. The first request may take 30–60 seconds to wake it up.
+> **Note:** The app runs on Render's free tier, which sleeps after 15 minutes of inactivity. The first request may take 30–60 seconds to wake it up.
 
 ## Features
 
@@ -50,18 +50,16 @@ The **Full-Stack Task Manager** is a web application that allows users to create
 
 ### Backend
 - **Node.js** — JavaScript runtime
-- **Express** — web framework for the REST API
+- **Express** — web framework for the REST API and static file server
 - **TypeScript** — type-safe server code
 - **Mongoose** — MongoDB object modeling
 - **dotenv** — environment variable management
-- **CORS** — cross-origin resource sharing
 
 ### Database
 - **MongoDB Atlas** — cloud-hosted NoSQL database
 
 ### Deployment
-- **Vercel** — frontend hosting
-- **Render** — backend hosting
+- **Render** — single-service hosting (Express serves both API and React build)
 
 ## Development Environment
 
@@ -79,6 +77,8 @@ The **Full-Stack Task Manager** is a web application that allows users to create
 - **TypeScript 5.9.3** — used on both frontend and backend
 - **CSS3** — styling the frontend
 
+
+
 ## Project Structure
 FullStackTaskManager/
 ├── backend/
@@ -91,7 +91,8 @@ FullStackTaskManager/
 │ │ │ └── Task.ts # Mongoose schema
 │ │ ├── routes/
 │ │ │ └── taskRoutes.ts # Express routes
-│ │ └── index.ts # Express app entry point
+│ │ └── index.ts # Express app — serves API + React build
+│ ├── public/ # React build output (populated by build.sh)
 │ ├── .env.example
 │ ├── package.json
 │ └── tsconfig.json
@@ -102,7 +103,7 @@ FullStackTaskManager/
 │ │ │ ├── TaskItem.tsx
 │ │ │ └── TaskList.tsx
 │ │ ├── services/
-│ │ │ └── taskService.ts # API calls
+│ │ │ └── taskService.ts # API calls (relative path)
 │ │ ├── types/
 │ │ │ └── Task.ts # TypeScript types
 │ │ ├── App.tsx
@@ -110,6 +111,7 @@ FullStackTaskManager/
 │ │ └── main.tsx
 │ ├── package.json
 │ └── vite.config.ts
+├── build.sh # Render build script
 ├── .gitignore
 └── README.md
 
@@ -127,3 +129,19 @@ Useful Websites
 `https://render.com/docs` Render Documentation – Backend deployment
 
 `https://vercel.com/docs` Vercel Documentation – Frontend deployment
+
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/) — Official TypeScript handbook
+
+- [React Documentation](https://react.dev/) — Official React documentation
+
+- [Node.js Documentation](https://nodejs.org/docs/latest/api/) — Node.js API reference
+
+- [Express Documentation](https://expressjs.com/) — Express.js guide
+
+- [Mongoose Documentation](https://mongoosejs.com/docs/) — MongoDB object modeling
+
+- [MongoDB Atlas Documentation](https://www.mongodb.com/docs/atlas/) — Cloud database guide
+
+- [Render Documentation](https://render.com/docs) — Full-stack deployment
+
+- [Stack Overflow](https://stackoverflow.com/) — Community Q&A
