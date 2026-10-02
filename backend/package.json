@@ -1,5 +1,5 @@
 {
-  "name": "taskmanager-backend",
+  "name": "daily-task-manager-backend",
   "version": "1.0.0",
   "description": "Full-stack Task Manager backend serving API + React frontend",
   "main": "dist/index.js",
